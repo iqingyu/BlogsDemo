@@ -11,12 +11,14 @@ namespace PluginDemo
         int GetInt();
 
         string GetString();
-
-        Key GetEnum();
+        
 
 
         object GetNonMarshalByRefObject();
 
         Action GetAction();
+
+
+        List<string> GetList();
     }
 }

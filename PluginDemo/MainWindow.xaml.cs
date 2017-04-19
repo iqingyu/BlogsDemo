@@ -1,19 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization;
 
 namespace PluginDemo
 {
@@ -29,7 +17,7 @@ namespace PluginDemo
 
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
 
         private void loadBtn_Click(object sender, RoutedEventArgs e)
@@ -76,6 +64,8 @@ namespace PluginDemo
             }
         }
 
+
+
         private void invokeBtn_Click(object sender, RoutedEventArgs e)
         {
             if (this.remoteIPlugin == null)
@@ -83,7 +73,6 @@ namespace PluginDemo
 
             this.txtBlock.AppendText($"GetInt():{ this.remoteIPlugin.GetInt().ToString()}\r\n");
             this.txtBlock.AppendText($"GetString():{ this.remoteIPlugin.GetString().ToString()}\r\n");
-            this.txtBlock.AppendText($"GetEnum():{ this.remoteIPlugin.GetEnum().ToString()}\r\n");
 
 
             try
@@ -118,10 +107,6 @@ namespace PluginDemo
                 }
             }
 
-            if (firstAction == null)
-                return;
-
-
             try
             {
                 this.txtBlock.AppendText("\r\n\r\n\r\n");
@@ -153,6 +138,36 @@ namespace PluginDemo
                     Debugger.Break();
                 }
             }
+
+            this.txtBlock.AppendText("\r\n\r\n\r\n");
+            
+            try
+            {
+                var list1 = this.remoteIPlugin.GetList();
+                this.txtBlock.AppendText($"list1.Count: {list1.Count}\r\n");
+                var list2 = this.remoteIPlugin.GetList();
+                this.txtBlock.AppendText($"list2.Count: {list2.Count}\r\n");
+
+
+                this.txtBlock.AppendText("\r\n");
+                list1.Add("C");
+                this.txtBlock.AppendText("list1.Add(\"C\")\r\n");
+
+
+                this.txtBlock.AppendText($"list1.Count: {list1.Count}\r\n");
+                this.txtBlock.AppendText($"list2.Count: {list2.Count}\r\n");
+
+                this.txtBlock.AppendText("！！！此例子，也间接证明支持序列化的类型，在跨AppDomain通信时，传递的是对象副本");
+            }
+            catch (Exception ex)
+            {
+                this.txtBlock.AppendText($"GetList():  { ex.Message}\r\n");
+                if (Debugger.IsAttached)
+                {
+                    Debugger.Break();
+                }
+            }
+           
         }
     }
 }

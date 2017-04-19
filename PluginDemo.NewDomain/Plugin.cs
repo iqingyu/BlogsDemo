@@ -12,7 +12,8 @@ namespace PluginDemo.NewDomain
     public class Plugin : MarshalByRefObject, IPlugin
     {
         /// <summary>
-        /// int 值类型，内存被分配到线程栈中，可以不受AppDomain的限制 在任何时候都可以直接访问
+        /// int 作为基础数据类型, 是持续序列化的.
+        /// <para>在与其他AppDomain通讯时，传递的是对象副本（通过序列化进行的值封送）</para>
         /// </summary>
         /// <returns></returns>
         public int GetInt()
@@ -20,29 +21,10 @@ namespace PluginDemo.NewDomain
             return int.MaxValue - new Random().Next();
         }
 
-        /// <summary>
-        /// 枚举类型，本质还是基础类型中的数字类型,即 值类型
-        /// </summary>
-        /// <returns></returns>
-        public System.Windows.Input.Key GetEnum()
-        {
-            return System.Windows.Input.Key.A;
-        }
-
-
 
         /// <summary>
-        /// 未继承 MarshalByRefObject 的 class , 不可以跨AppDomain访问
-        /// </summary>
-        /// <returns></returns>
-        public object GetNonMarshalByRefObject()
-        {
-            return new NonMarshalByRefObject();
-        }
-
-
-        /// <summary>
-        /// 在我已知的class里面，string 是个特殊类，可以跨AppDomain访问
+        /// string 作为特殊的class, 也是持续序列化的.
+        /// <para>在与其他AppDomain通讯时，传递的是对象副本（通过序列化进行的值封送）</para>
         /// </summary>
         /// <returns></returns>
         public string GetString()
@@ -51,10 +33,21 @@ namespace PluginDemo.NewDomain
         }
 
 
+
+        /// <summary>
+        /// 未继承 MarshalByRefObject 并且 不支持序列化 的 class, 是不可以跨AppDomain通信的，也就是说其他AppDomain是获取不到其对象的
+        /// </summary>
+        /// <returns></returns>
+        public object GetNonMarshalByRefObject()
+        {
+            return new NonMarshalByRefObject();
+        }
+
         private NonMarshalByRefObjectAction obj = new NonMarshalByRefObjectAction();
 
         /// <summary>
         /// 委托，和 委托所指向的类型相关
+        /// <para>也就是说，如果其指向的类型支持跨AppDomain通信，那个其他AppDomain就可以获取都该委托， 反之，则不能获取到</para>
         /// </summary>
         /// <returns></returns>
         public Action GetAction()
@@ -66,11 +59,24 @@ namespace PluginDemo.NewDomain
             return obj.TestAction;
         }
 
+        private List<string> list = new List<string>() { "A", "B" };
+
+        /// <summary>
+        /// List<T> 也是持续序列化的, 当然前提是T也必须支持跨AppDomain通信
+        /// <para>在与其他AppDomain通讯时，传递的是对象副本（通过序列化进行的值封送）</para>
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetList()
+        {
+            return this.list;
+            // return new List<Action>() { this.GetAction() };
+        }
+
     }
 
 
     [Serializable]
-    public class NonMarshalByRefObjectAction //: MarshalByRefObject
+    public class NonMarshalByRefObjectAction // : MarshalByRefObject
     {
         private int index = 0;
 
@@ -81,6 +87,8 @@ namespace PluginDemo.NewDomain
 
         public void TestAction()
         {
+            this.index++;
+
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine($"current index is {index} ");
