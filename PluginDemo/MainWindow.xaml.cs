@@ -17,7 +17,7 @@ namespace PluginDemo
 
         public MainWindow()
         {
-            InitializeComponent();            
+            InitializeComponent();
         }
 
         private void loadBtn_Click(object sender, RoutedEventArgs e)
@@ -140,7 +140,7 @@ namespace PluginDemo
             }
 
             this.txtBlock.AppendText("\r\n\r\n\r\n");
-            
+
             try
             {
                 var list1 = this.remoteIPlugin.GetList();
@@ -157,7 +157,7 @@ namespace PluginDemo
                 this.txtBlock.AppendText($"list1.Count: {list1.Count}\r\n");
                 this.txtBlock.AppendText($"list2.Count: {list2.Count}\r\n");
 
-                this.txtBlock.AppendText("！！！此例子，也间接证明支持序列化的类型，在跨AppDomain通信时，传递的是对象副本");
+                this.txtBlock.AppendText("！！！此例子，也间接证明支持序列化的类型，在跨AppDomain通信时，传递的是对象副本\r\n\r\n");
             }
             catch (Exception ex)
             {
@@ -167,7 +167,7 @@ namespace PluginDemo
                     Debugger.Break();
                 }
             }
-           
+
         }
     }
 }

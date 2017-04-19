@@ -11,6 +11,9 @@ namespace PluginDemo.NewDomain
     /// </summary>
     public class Plugin : MarshalByRefObject, IPlugin
     {
+        // AppDomain被卸载后，静态成员的内存会被释放掉
+        private static int length;
+
         /// <summary>
         /// int 作为基础数据类型, 是持续序列化的.
         /// <para>在与其他AppDomain通讯时，传递的是对象副本（通过序列化进行的值封送）</para>
@@ -18,7 +21,9 @@ namespace PluginDemo.NewDomain
         /// <returns></returns>
         public int GetInt()
         {
-            return int.MaxValue - new Random().Next();
+            length += new Random().Next(10000);
+
+            return length;
         }
 
 
