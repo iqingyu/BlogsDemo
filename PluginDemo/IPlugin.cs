@@ -12,12 +12,9 @@ namespace PluginDemo
 
         string GetString();
         
-
-
         object GetNonMarshalByRefObject();
 
         Action GetAction();
-
 
         List<string> GetList();
     }

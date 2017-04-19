@@ -14,9 +14,9 @@
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal">
-            <Button x:Name="loadBtn" Width="120" Click="loadBtn_Click">Load AppDomain</Button>
-            <Button x:Name="invokeBtn" Width="120" Click="invokeBtn_Click">Access Other Member</Button>
-            <Button x:Name="unLoadBtn" Width="120" Click="unLoadBtn_Click">UnLoad AppDomain</Button>
+            <Button x:Name="loadBtn" Width="150" Click="loadBtn_Click">Load AppDomain</Button>
+            <Button x:Name="invokeBtn" Width="150" Click="invokeBtn_Click">Access Other Member</Button>
+            <Button x:Name="unLoadBtn" Width="150" Click="unLoadBtn_Click">UnLoad AppDomain</Button>
         </StackPanel>
 
         <TextBox Grid.Row="2" x:Name="txtBlock" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"></TextBox>
