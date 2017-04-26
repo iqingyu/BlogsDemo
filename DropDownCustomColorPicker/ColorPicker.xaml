@@ -1,0 +1,209 @@
+﻿<UserControl
+    x:Class="DropDownCustomColorPicker.ColorPicker"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="clr-namespace:DropDownCustomColorPicker"
+    Width="425">
+    <UserControl.Resources>
+        <d:ColorToSolidColorBrushConverter x:Key="FromColorToSolidColorBrushConverter" />
+    </UserControl.Resources>
+    <StackPanel>
+        <Expander
+            Name="epDefaultcolor"
+            Header="预定义颜色"
+            IsExpanded="True"
+            PreviewMouseLeftButtonDown="epDefaultcolor_PreviewMouseLeftButtonDown">
+            <ListBox x:Name="DefaultPicker" SnapsToDevicePixels="True">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Rectangle
+                            Width="20"
+                            Height="20"
+                            HorizontalAlignment="Center"
+                            Fill="{Binding Converter={StaticResource FromColorToSolidColorBrushConverter}}"
+                            Stroke="Black" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Width="415" Margin="0,5,0,5" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+        </Expander>
+        <Expander
+            Name="epCustomcolor"
+            Expanded="epCustomcolor_Expanded"
+            Header="自由选择"
+            IsExpanded="False">
+
+            <StackPanel Orientation="Horizontal">
+                <Border
+                    Width="144"
+                    Height="144"
+                    Margin="5,5,0,0"
+                    Background="Black"
+                    BorderBrush="Black"
+                    BorderThickness="2">
+
+                    <Grid
+                        Width="140"
+                        Height="140"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                        <Image
+                            x:Name="image"
+                            Width="140"
+                            Height="140" />
+
+                        <Canvas
+                            x:Name="CanvasColor"
+                            Width="140"
+                            Height="140"
+                            Background="Transparent">
+
+                            <Ellipse
+                                x:Name="EpPointer"
+                                Width="8"
+                                Height="8"
+                                Fill="White"
+                                Stroke="Black"
+                                IsHitTestVisible="True" />
+
+                        </Canvas>
+                    </Grid>
+
+                </Border>
+
+                <StackPanel Margin="15,0,0,0" Orientation="Vertical">
+
+                    <StackPanel Margin="0,12,0,12" Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontWeight="Bold"
+                            Text="HEX:" />
+                        <Border
+                            Width="80"
+                            Height="30"
+                            Margin="3,0,0,0"
+                            Background="White"
+                            BorderBrush="Black"
+                            BorderThickness="2"
+                            CornerRadius="5">
+                            <TextBox
+                                x:Name="txtAll"
+                                VerticalAlignment="Center"
+                                Background="White"
+                                Foreground="Black"
+                                TextAlignment="Center" />
+                        </Border>
+
+                        <TextBlock
+                            Margin="15,0,0,0"
+                            VerticalAlignment="Center"
+                            FontWeight="Bold"
+                            Text="预览:" />
+                        <Border
+                            Name="lblPreview"
+                            Width="80"
+                            Height="30"
+                            BorderBrush="Black"
+                            BorderThickness="2"
+                            CornerRadius="5" />
+                    </StackPanel>
+
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontWeight="Bold"
+                            Text="A:" />
+                        <Slider
+                            x:Name="SdA"
+                            Width="100"
+                            Margin="3"
+                            VerticalAlignment="Center"
+                            IsSnapToTickEnabled="True"
+                            LargeChange="25"
+                            Maximum="255"
+                            Minimum="0"
+                            Orientation="Horizontal"
+                            SmallChange="1"
+                            TickFrequency="1"
+                            ToolTip="{Binding Value, RelativeSource={RelativeSource Self}}"
+                            ValueChanged="SdA_ValueChanged"
+                            Value="255" />
+
+                        <TextBlock
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            FontWeight="Bold"
+                            Text="R:" />
+                        <Slider
+                            x:Name="SdR"
+                            Width="100"
+                            Margin="5"
+                            VerticalAlignment="Center"
+                            IsSnapToTickEnabled="True"
+                            LargeChange="25"
+                            Maximum="255"
+                            Minimum="0"
+                            Orientation="Horizontal"
+                            SmallChange="1"
+                            TickFrequency="1"
+                            ToolTip="{Binding Value, RelativeSource={RelativeSource Self}}"
+                            ValueChanged="SdR_ValueChanged"
+                            Value="255" />
+                    </StackPanel>
+
+
+                    <StackPanel Margin="0,12,0,0" Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontWeight="Bold"
+                            Text="G:" />
+                        <Slider
+                            x:Name="SdG"
+                            Width="100"
+                            Margin="3"
+                            VerticalAlignment="Center"
+                            IsSnapToTickEnabled="True"
+                            LargeChange="25"
+                            Maximum="255"
+                            Minimum="0"
+                            Orientation="Horizontal"
+                            SmallChange="1"
+                            TickFrequency="1"
+                            ToolTip="{Binding Value, RelativeSource={RelativeSource Self}}"
+                            ValueChanged="SdG_ValueChanged"
+                            Value="255" />
+
+                        <TextBlock
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            FontWeight="Bold"
+                            Text="B:" />
+                        <Slider
+                            x:Name="SdB"
+                            Width="100"
+                            Margin="5"
+                            VerticalAlignment="Center"
+                            IsSnapToTickEnabled="True"
+                            LargeChange="25"
+                            Maximum="255"
+                            Minimum="0"
+                            Orientation="Horizontal"
+                            SmallChange="1"
+                            TickFrequency="1"
+                            ToolTip="{Binding Value, RelativeSource={RelativeSource Self}}"
+                            ValueChanged="SdB_ValueChanged"
+                            Value="255" />
+                    </StackPanel>
+
+
+                </StackPanel>
+            </StackPanel>
+        </Expander>
+    </StackPanel>
+</UserControl>

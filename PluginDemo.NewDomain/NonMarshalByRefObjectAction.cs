@@ -24,7 +24,7 @@ namespace PluginDemo.NewDomain
             sb.AppendLine($"current index is {index} ");
 
             sb.AppendLine($"如果一个类型 【不是】 {nameof(MarshalByRefObject)}的子类 并且 【没有标记】 {nameof(SerializableAttribute)}, ");
-            sb.AppendLine($"则该类型的对象不能被其他AppDomain中的代码所访问, 当然这种情况下的该类型对象中的成员也不可能被访问到了 ");
+            sb.AppendLine($"则该类型的对象不能被其他AppDomain中的对象所访问, 当然这种情况下的该类型对象中的成员也不可能被访问到了 ");
             sb.AppendLine("反之，则可以被其他AppDomain中的对象所访问 ");
 
             sb.AppendLine();
@@ -43,7 +43,7 @@ namespace PluginDemo.NewDomain
 
             sb.AppendLine();
 
-            sb.AppendLine("另外：.net 基本类型 、string 类型、 List<T> 等类型，虽然没有标记 SerializableAttribute， 但是他们依然可以序列化。");
+            sb.AppendLine("另外：.net 基本类型 、string 类型、 List<T> 等类型，虽然没有标记 SerializableAttribute， 但是他们依然可以序列化。也就是说这些类型都可以在不同的AppDomain之间通信，只是传递的都是对象副本。");
 
             sb.AppendLine();
 
