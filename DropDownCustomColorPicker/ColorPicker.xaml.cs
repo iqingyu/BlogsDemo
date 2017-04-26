@@ -23,6 +23,8 @@ namespace DropDownCustomColorPicker
 
         private Color customColor = Colors.Black;
 
+
+
         public CustomColorPicker CustomColorPicker
         {
             get { return (CustomColorPicker)GetValue(CustomColorPickerProperty); }
@@ -66,9 +68,200 @@ namespace DropDownCustomColorPicker
             CanvasColor.MouseLeftButtonDown += new MouseButtonEventHandler(CanColor_MouseLeftButtonDown);
             CanvasColor.MouseMove += CanvasColor_MouseMove;
 
-
             // 防止菜单关闭
             this.MouseLeftButtonUp += ColorPicker_MouseLeftButtonUp;
+
+            InitDefaultValues();
+        }
+
+
+        private void InitDefaultValues()
+        {
+            this.CustomColor = this.customColor;
+            this.epDefaultcolor.IsExpanded = true;
+        }
+
+        private void InitColors()
+        {
+            DefaultPicker.Items.Clear();
+            CustomColors customColors = new CustomColors();
+            foreach (var item in customColors.SelectableColors)
+            {
+                DefaultPicker.Items.Add(item);
+            }
+            DefaultPicker.SelectionChanged += new SelectionChangedEventHandler(DefaultPicker_SelectionChanged);
+        }
+
+        private void UpdatePreview()
+        {
+            lblPreview.Background = new SolidColorBrush(CustomColor);
+
+            string alphaHex = CustomColor.A.ToString("X").PadLeft(2, '0');
+            string redHex = CustomColor.R.ToString("X").PadLeft(2, '0');
+            string greenHex = CustomColor.G.ToString("X").PadLeft(2, '0');
+            string blueHex = CustomColor.B.ToString("X").PadLeft(2, '0');
+
+            txtAll.Text = String.Format("#{0}{1}{2}{3}", alphaHex, redHex, greenHex, blueHex);
+
+            if (SdA.Value != CustomColor.A)
+                SdA.Value = CustomColor.A;
+
+            if (SdR.Value != CustomColor.R)
+                SdR.Value = CustomColor.R;
+
+            if (SdG.Value != CustomColor.G)
+                SdG.Value = CustomColor.G;
+
+            if (SdB.Value != CustomColor.B)
+                SdB.Value = CustomColor.B;
+        }
+
+
+
+        private Color MakeColorFromHex(object sender)
+        {
+            try
+            {
+                ColorConverter cc = new ColorConverter();
+                return (Color)cc.ConvertFrom(((TextBox)sender).Text);
+
+            }
+            catch
+            {
+                string alphaHex = CustomColor.A.ToString("X").PadLeft(2, '0');
+                string redHex = CustomColor.R.ToString("X").PadLeft(2, '0');
+                string greenHex = CustomColor.G.ToString("X").PadLeft(2, '0');
+                string blueHex = CustomColor.B.ToString("X").PadLeft(2, '0');
+
+                txtAll.Text = String.Format("#{0}{1}{2}{3}", alphaHex, redHex, greenHex, blueHex);
+            }
+
+            return CustomColor;
+        }
+
+        public static BitmapSource loadBitmap(System.Drawing.Bitmap source)
+        {
+            return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(source.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty,
+                System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+        }
+
+
+        private void ChangeColor()
+        {
+            try
+            {
+                CustomColor = GetColorFromImage((int)Mouse.GetPosition(CanvasColor).X, (int)Mouse.GetPosition(CanvasColor).Y);
+                MovePointer();
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void Reposition()
+        {
+            // 效率太低，屏蔽该功能
+            return;
+
+            for (int i = 0; i < CanvasColor.ActualWidth; i++)
+            {
+                bool flag = false;
+
+                for (int j = 0; j < CanvasColor.ActualHeight; j++)
+                {
+
+                    try
+                    {
+                        Color Colorfromimagepoint = GetColorFromImage(i, j);
+
+                        if (SimmilarColor(Colorfromimagepoint, CustomColor))
+                        {
+                            MovePointerDuringReposition(i, j);
+                            flag = true;
+                            break;
+                        }
+
+                    }
+                    catch
+                    {
+                    }
+                }
+
+                if (flag)
+                {
+                    break;
+                }
+            }
+
+        }
+
+
+        /// <summary>
+        /// 1*1 pixel copy is based on an article by Lee Brimelow    
+        /// http://thewpfblog.com/?p=62
+        /// </summary>
+        private Color GetColorFromImage(int i, int j)
+        {
+            CroppedBitmap cb = new CroppedBitmap(image.Source as BitmapSource,
+                new Int32Rect(i,
+                    j, 1, 1));
+            byte[] color = new byte[4];
+            cb.CopyPixels(color, 4, 0);
+            Color Colorfromimagepoint = Color.FromArgb((byte)SdA.Value, color[2], color[1], color[0]);
+            return Colorfromimagepoint;
+        }
+
+        private void MovePointerDuringReposition(int i, int j)
+        {
+            EpPointer.SetValue(Canvas.LeftProperty, (double)(i - 3));
+            EpPointer.SetValue(Canvas.TopProperty, (double)(j - 3));
+            EpPointer.InvalidateVisual();
+            CanvasColor.InvalidateVisual();
+        }
+
+        private void MovePointer()
+        {
+            EpPointer.SetValue(Canvas.LeftProperty, (double)(Mouse.GetPosition(CanvasColor).X - 5));
+            EpPointer.SetValue(Canvas.TopProperty, (double)(Mouse.GetPosition(CanvasColor).Y - 5));
+            CanvasColor.InvalidateVisual();
+        }
+
+        private bool SimmilarColor(Color pointColor, Color selectedColor)
+        {
+            int diff = Math.Abs(pointColor.R - selectedColor.R) + Math.Abs(pointColor.G - selectedColor.G) + Math.Abs(pointColor.B - selectedColor.B);
+            if (diff < 20) return true;
+            else
+                return false;
+        }
+
+
+
+
+        #region Events
+
+
+        private void DefaultPicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DefaultPicker.SelectedValue != null)
+            {
+                CustomColor = (Color)DefaultPicker.SelectedValue;
+            }
+
+            FrameworkElement frameworkElement = this;
+            while (true)
+            {
+                if (frameworkElement == null) break;
+                if (frameworkElement is ContextMenu)
+                {
+                    ((ContextMenu)frameworkElement).IsOpen = false;
+                    break;
+                }
+                if (frameworkElement.Parent != null)
+                    frameworkElement = (FrameworkElement)frameworkElement.Parent;
+                else
+                    break;
+            }
         }
 
 
@@ -77,7 +270,6 @@ namespace DropDownCustomColorPicker
             // 防止菜单关闭
             e.Handled = true;
         }
-
 
         private void CanvasColor_MouseMove(object sender, MouseEventArgs e)
         {
@@ -93,7 +285,6 @@ namespace DropDownCustomColorPicker
             ChangeColor();
             e.Handled = true;
         }
-
 
         private void txtAll_KeyDown(object sender, KeyEventArgs e)
         {
@@ -152,189 +343,6 @@ namespace DropDownCustomColorPicker
 
         }
 
-        private Color MakeColorFromHex(object sender)
-        {
-            try
-            {
-                ColorConverter cc = new ColorConverter();
-                return (Color)cc.ConvertFrom(((TextBox)sender).Text);
-
-            }
-            catch
-            {
-                string alphaHex = CustomColor.A.ToString("X").PadLeft(2, '0');
-                string redHex = CustomColor.R.ToString("X").PadLeft(2, '0');
-                string greenHex = CustomColor.G.ToString("X").PadLeft(2, '0');
-                string blueHex = CustomColor.B.ToString("X").PadLeft(2, '0');
-
-                txtAll.Text = String.Format("#{0}{1}{2}{3}", alphaHex, redHex, greenHex, blueHex);
-            }
-
-            return CustomColor;
-        }
-
-        public static BitmapSource loadBitmap(System.Drawing.Bitmap source)
-        {
-            return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(source.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty,
-                System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
-        }
-
-        private void InitColors()
-        {
-            DefaultPicker.Items.Clear();
-            CustomColors customColors = new CustomColors();
-            foreach (var item in customColors.SelectableColors)
-            {
-                DefaultPicker.Items.Add(item);
-            }
-            DefaultPicker.SelectionChanged += new SelectionChangedEventHandler(DefaultPicker_SelectionChanged);
-        }
-
-        private void DefaultPicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (DefaultPicker.SelectedValue != null)
-            {
-                CustomColor = (Color)DefaultPicker.SelectedValue;
-            }
-
-            FrameworkElement frameworkElement = this;
-            while (true)
-            {
-                if (frameworkElement == null) break;
-                if (frameworkElement is ContextMenu)
-                {
-                    ((ContextMenu)frameworkElement).IsOpen = false;
-                    break;
-                }
-                if (frameworkElement.Parent != null)
-                    frameworkElement = (FrameworkElement)frameworkElement.Parent;
-                else
-                    break;
-            }
-        }
-
-        private void ChangeColor()
-        {
-            try
-            {
-                CustomColor = GetColorFromImage((int)Mouse.GetPosition(CanvasColor).X, (int)Mouse.GetPosition(CanvasColor).Y);
-                MovePointer();
-            }
-            catch
-            {
-
-            }
-        }
-
-        private void Reposition()
-        {
-            // 效率太低，屏蔽该功能
-            return;
-
-            for (int i = 0; i < CanvasColor.ActualWidth; i++)
-            {
-                bool flag = false;
-
-                for (int j = 0; j < CanvasColor.ActualHeight; j++)
-                {
-
-                    try
-                    {
-                        Color Colorfromimagepoint = GetColorFromImage(i, j);
-
-                        if (SimmilarColor(Colorfromimagepoint, CustomColor))
-                        {
-                            MovePointerDuringReposition(i, j);
-                            flag = true;
-                            break;
-                        }
-
-                    }
-                    catch
-                    {
-                    }
-                }
-
-                if (flag)
-                {
-                    break;
-                }
-            }
-
-        }
-
-
-        /// <summary>
-        /// 1*1 pixel copy is based on an article by Lee Brimelow    
-        /// http://thewpfblog.com/?p=62
-        /// </summary>
-
-        private Color GetColorFromImage(int i, int j)
-        {
-            CroppedBitmap cb = new CroppedBitmap(image.Source as BitmapSource,
-                new Int32Rect(i,
-                    j, 1, 1));
-            byte[] color = new byte[4];
-            cb.CopyPixels(color, 4, 0);
-            Color Colorfromimagepoint = Color.FromArgb((byte)SdA.Value, color[2], color[1], color[0]);
-            return Colorfromimagepoint;
-        }
-
-        private void MovePointerDuringReposition(int i, int j)
-        {
-            EpPointer.SetValue(Canvas.LeftProperty, (double)(i - 3));
-            EpPointer.SetValue(Canvas.TopProperty, (double)(j - 3));
-            EpPointer.InvalidateVisual();
-            CanvasColor.InvalidateVisual();
-        }
-        private void MovePointer()
-        {
-            EpPointer.SetValue(Canvas.LeftProperty, (double)(Mouse.GetPosition(CanvasColor).X - 5));
-            EpPointer.SetValue(Canvas.TopProperty, (double)(Mouse.GetPosition(CanvasColor).Y - 5));
-            CanvasColor.InvalidateVisual();
-        }
-
-        private bool SimmilarColor(Color pointColor, Color selectedColor)
-        {
-            int diff = Math.Abs(pointColor.R - selectedColor.R) + Math.Abs(pointColor.G - selectedColor.G) + Math.Abs(pointColor.B - selectedColor.B);
-            if (diff < 20) return true;
-            else
-                return false;
-        }
-
-        private void UpdatePreview()
-        {
-            lblPreview.Background = new SolidColorBrush(CustomColor);
-
-            string alphaHex = CustomColor.A.ToString("X").PadLeft(2, '0');
-            string redHex = CustomColor.R.ToString("X").PadLeft(2, '0');
-            string greenHex = CustomColor.G.ToString("X").PadLeft(2, '0');
-            string blueHex = CustomColor.B.ToString("X").PadLeft(2, '0');
-
-            txtAll.Text = String.Format("#{0}{1}{2}{3}", alphaHex, redHex, greenHex, blueHex);
-
-            if (SdA != null && SdA.Value != CustomColor.A)
-                SdA.Value = CustomColor.A;
-
-            if (SdR != null && SdR.Value != CustomColor.R)
-                SdR.Value = CustomColor.R;
-
-            if (SdG != null && SdG.Value != CustomColor.G)
-                SdG.Value = CustomColor.G;
-
-            if (SdB != null && SdB.Value != CustomColor.B)
-                SdB.Value = CustomColor.B;
-        }
-
-        private void epDefaultcolor_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            epCustomcolor.IsExpanded = false;
-        }
-
-        private void epCustomcolor_Expanded(object sender, RoutedEventArgs e)
-        {
-            epDefaultcolor.IsExpanded = false;
-        }
 
         private void SdA_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -359,6 +367,31 @@ namespace DropDownCustomColorPicker
             if (CustomColor.B != (byte)SdB.Value)
                 CustomColor = Color.FromArgb(CustomColor.A, CustomColor.R, CustomColor.G, (byte)SdB.Value);
         }
+
+
+        private void epDefaultcolor_Collapsed(object sender, RoutedEventArgs e)
+        {
+            epCustomcolor.IsExpanded = true;
+        }
+
+        private void epDefaultcolor_Expanded(object sender, RoutedEventArgs e)
+        {
+            epCustomcolor.IsExpanded = false;
+        }
+
+        private void epCustomcolor_Expanded(object sender, RoutedEventArgs e)
+        {
+            epDefaultcolor.IsExpanded = false;
+        }
+
+        private void epCustomcolor_Collapsed(object sender, RoutedEventArgs e)
+        {
+            epDefaultcolor.IsExpanded = true;
+        }
+
+        #endregion
+
+
     }
 
     public class CustomColors
@@ -397,6 +430,7 @@ namespace DropDownCustomColorPicker
 
     }
 
+
     [ValueConversion(typeof(Color), typeof(Brush))]
     public class ColorToSolidColorBrushConverter : IValueConverter
     {
@@ -414,4 +448,6 @@ namespace DropDownCustomColorPicker
 
         #endregion
     }
+
+
 }

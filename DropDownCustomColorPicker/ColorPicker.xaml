@@ -10,9 +10,9 @@
     <StackPanel>
         <Expander
             Name="epDefaultcolor"
-            Header="预定义颜色"
-            IsExpanded="True"
-            PreviewMouseLeftButtonDown="epDefaultcolor_PreviewMouseLeftButtonDown">
+            Collapsed="epDefaultcolor_Collapsed"
+            Expanded="epDefaultcolor_Expanded"
+            Header="预定义颜色">
             <ListBox x:Name="DefaultPicker" SnapsToDevicePixels="True">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -33,9 +33,9 @@
         </Expander>
         <Expander
             Name="epCustomcolor"
+            Collapsed="epCustomcolor_Collapsed"
             Expanded="epCustomcolor_Expanded"
-            Header="自由选择"
-            IsExpanded="False">
+            Header="自由选择">
 
             <StackPanel Orientation="Horizontal">
                 <Border
@@ -132,8 +132,7 @@
                             SmallChange="1"
                             TickFrequency="1"
                             ToolTip="{Binding Value, RelativeSource={RelativeSource Self}}"
-                            ValueChanged="SdA_ValueChanged"
-                            Value="255" />
+                            ValueChanged="SdA_ValueChanged" />
 
                         <TextBlock
                             Margin="10,0,0,0"
@@ -153,8 +152,7 @@
                             SmallChange="1"
                             TickFrequency="1"
                             ToolTip="{Binding Value, RelativeSource={RelativeSource Self}}"
-                            ValueChanged="SdR_ValueChanged"
-                            Value="255" />
+                            ValueChanged="SdR_ValueChanged" />
                     </StackPanel>
 
 
@@ -176,8 +174,7 @@
                             SmallChange="1"
                             TickFrequency="1"
                             ToolTip="{Binding Value, RelativeSource={RelativeSource Self}}"
-                            ValueChanged="SdG_ValueChanged"
-                            Value="255" />
+                            ValueChanged="SdG_ValueChanged" />
 
                         <TextBlock
                             Margin="10,0,0,0"
@@ -197,8 +194,7 @@
                             SmallChange="1"
                             TickFrequency="1"
                             ToolTip="{Binding Value, RelativeSource={RelativeSource Self}}"
-                            ValueChanged="SdB_ValueChanged"
-                            Value="255" />
+                            ValueChanged="SdB_ValueChanged" />
                     </StackPanel>
 
 
