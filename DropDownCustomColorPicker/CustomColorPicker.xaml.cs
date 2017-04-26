@@ -93,14 +93,14 @@ namespace DropDownCustomColorPicker
             }
         }
 
+
         internal void RaiseSelectedColorChangedEvent()
         {
             RoutedPropertyChangedEventArgs<Color> args = new RoutedPropertyChangedEventArgs<Color>(
               Colors.Transparent, cp.CustomColor, SelectedColorChangedEvent);
 
-            this.RaiseEvent(args);
-
             recContent.Fill = new SolidColorBrush(cp.CustomColor);
+            this.RaiseEvent(args);
         }
 
         private void b_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
