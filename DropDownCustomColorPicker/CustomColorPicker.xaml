@@ -6,7 +6,8 @@
     xmlns:mun="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Royale"
     xmlns:s="clr-namespace:System;assembly=mscorlib"
     Width="50"
-    Height="30">
+    Height="25"
+    Focusable="True">
     <UserControl.Resources>
         <Style x:Key="ColorPickerContextMenu" TargetType="{x:Type ContextMenu}">
             <Setter Property="ItemContainerStyle">
@@ -185,7 +186,7 @@
 
     <Button Name="b" Style="{StaticResource ColorPickerButton}">
         <Button.ContextMenu>
-            <ContextMenu Style="{StaticResource ColorPickerContextMenu}">
+            <ContextMenu Style="{StaticResource ColorPickerContextMenu}" Closed="ContextMenu_Closed" Opened="ContextMenu_Opened">
                 <Border Background="GhostWhite">
                     <d:ColorPicker x:Name="cp" />
                 </Border>
@@ -195,8 +196,8 @@
             Name="recContent"
             Width="{Binding ColorRectSize.Width, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
             Height="{Binding ColorRectSize.Height, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
-            Margin="0,1,0,1"
             HorizontalAlignment="Center"
+            VerticalAlignment="Center"
             Stroke="Black" />
     </Button>
 </UserControl>

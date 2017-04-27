@@ -12,8 +12,14 @@
             Name="epDefaultcolor"
             Collapsed="epDefaultcolor_Collapsed"
             Expanded="epDefaultcolor_Expanded"
-            Header="预定义颜色">
-            <ListBox x:Name="DefaultPicker" SnapsToDevicePixels="True">
+            Header="预定义颜色"
+            IsTabStop="False">
+            <ListBox
+                x:Name="DefaultPicker"
+                IsTabStop="False"
+                PreviewMouseLeftButtonDown="DefaultPicker_PreviewMouseLeftButtonDown"
+                PreviewMouseLeftButtonUp="DefaultPicker_PreviewMouseLeftButtonUp"
+                SnapsToDevicePixels="True">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Rectangle
@@ -35,7 +41,8 @@
             Name="epCustomcolor"
             Collapsed="epCustomcolor_Collapsed"
             Expanded="epCustomcolor_Expanded"
-            Header="自由选择">
+            Header="自由选择"
+            IsTabStop="False">
 
             <StackPanel Orientation="Horizontal">
                 <Border

@@ -19,10 +19,11 @@ namespace DropDownCustomColorPicker
 
     public partial class ColorPicker : UserControl
     {
-        private bool _shift = false;
+        // 该变量辅助 SHIFT + 3
+        private bool shiftPressed = false;
+        private bool selectChanged = false;
 
         private Color customColor = Colors.Black;
-
 
 
         public CustomColorPicker CustomColorPicker
@@ -75,6 +76,9 @@ namespace DropDownCustomColorPicker
         }
 
 
+        #region Private Method
+
+        
         private void InitDefaultValues()
         {
             this.CustomColor = this.customColor;
@@ -235,8 +239,8 @@ namespace DropDownCustomColorPicker
                 return false;
         }
 
-
-
+        #endregion
+        
 
         #region Events
 
@@ -246,24 +250,34 @@ namespace DropDownCustomColorPicker
             if (DefaultPicker.SelectedValue != null)
             {
                 CustomColor = (Color)DefaultPicker.SelectedValue;
+                selectChanged = true;
             }
 
-            FrameworkElement frameworkElement = this;
-            while (true)
-            {
-                if (frameworkElement == null) break;
-                if (frameworkElement is ContextMenu)
-                {
-                    ((ContextMenu)frameworkElement).IsOpen = false;
-                    break;
-                }
-                if (frameworkElement.Parent != null)
-                    frameworkElement = (FrameworkElement)frameworkElement.Parent;
-                else
-                    break;
-            }
+            // Tip 其实可以在这里直接关闭Picker的，之所以绕远，在 MouseUp事件里去关闭， 
+            // 是为了兼容该控件在 Popup 上使用的情况（方便控制焦点转移 和 Popup自由控件开关）
+
+            //if (this.CustomColorPicker != null)
+            //{
+            //    this.CustomColorPicker.ClosePicker();
+            //}            
         }
 
+
+        private void DefaultPicker_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            this.selectChanged = false;
+        }
+
+        private void DefaultPicker_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (this.selectChanged)
+            {
+                if (this.CustomColorPicker != null)
+                {
+                    this.CustomColorPicker.ClosePicker();
+                }
+            }
+        }
 
         private void ColorPicker_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -308,18 +322,18 @@ namespace DropDownCustomColorPicker
             {
                 input = e.Key.ToString();
             }
-            if (input == "3" && _shift == true)
+            if (input == "3" && shiftPressed == true)
             {
                 input = "#";
             }
 
             if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {
-                _shift = true;
+                shiftPressed = true;
             }
             else
             {
-                _shift = false;
+                shiftPressed = false;
             }
 
             if (!(input == "#" || (input[0] >= 'A' && input[0] <= 'F') || (input[0] >= 'a' && input[0] <= 'F') || (input[0] >= '0' && input[0] <= '9')))
@@ -389,65 +403,13 @@ namespace DropDownCustomColorPicker
             epDefaultcolor.IsExpanded = true;
         }
 
-        #endregion
-
-
-    }
-
-    public class CustomColors
-    {
-        List<Color> selectableColors = null;
-
-        public List<Color> SelectableColors
-        {
-            get { return selectableColors; }
-            set { selectableColors = value; }
-        }
-
-        public CustomColors()
-        {
-            var list = new List<Color>();
-
-            Type ColorsType = typeof(Colors);
-            PropertyInfo[] ColorsProperty = ColorsType.GetProperties();
-
-            foreach (PropertyInfo property in ColorsProperty)
-            {
-                list.Add((Color)ColorConverter.ConvertFromString(property.Name));
-            }
-
-            list.Sort(new Comparison<Color>((Color x, Color y) =>
-            {
-                var xtotal = x.R + x.G + x.B;
-
-                var ytotal = y.R + y.G + y.B;
-
-                return xtotal.CompareTo(ytotal); // 升序排列
-            }));
-
-            selectableColors = list;
-        }
-
-    }
-
-
-    [ValueConversion(typeof(Color), typeof(Brush))]
-    public class ColorToSolidColorBrushConverter : IValueConverter
-    {
-        #region IValueConverter Members
-
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return new SolidColorBrush((Color)value);
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
 
         #endregion
+
     }
+
+
+
 
 
 }

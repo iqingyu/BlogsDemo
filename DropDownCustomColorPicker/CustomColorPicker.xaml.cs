@@ -19,6 +19,9 @@ namespace DropDownCustomColorPicker
     /// </summary>
     public partial class CustomColorPicker : UserControl
     {
+
+        #region TBEvents
+
         /// <summary>
         /// 自定义颜色改变事件
         /// </summary>
@@ -35,6 +38,26 @@ namespace DropDownCustomColorPicker
         }
 
 
+        /// <summary>
+        /// 自定义DropDown状态改变事件
+        /// </summary>
+        public static readonly RoutedEvent DropDownStateChangedEvent =
+            EventManager.RegisterRoutedEvent("DropDownStateChanged", RoutingStrategy.Direct, typeof(RoutedPropertyChangedEventHandler<bool>), typeof(CustomColorPicker));
+
+        /// <summary>
+        /// 自定义DropDown状态改变事件 CLR包装器
+        /// </summary>
+        public event RoutedPropertyChangedEventHandler<bool> DropDownStateChanged
+        {
+            add { this.AddHandler(DropDownStateChangedEvent, value); }
+            remove { this.RemoveHandler(DropDownStateChangedEvent, value); }
+        }
+
+        #endregion
+
+
+        #region DPProperties
+
         public Size ColorRectSize
         {
             get { return (Size)GetValue(ColorRectSizeProperty); }
@@ -42,8 +65,7 @@ namespace DropDownCustomColorPicker
         }
 
         public static readonly DependencyProperty ColorRectSizeProperty =
-            DependencyProperty.Register("ColorRectSize", typeof(Size), typeof(CustomColorPicker), new PropertyMetadata(new Size(15, 15)));
-
+            DependencyProperty.Register("ColorRectSize", typeof(Size), typeof(CustomColorPicker), new PropertyMetadata(new Size(12, 12)));
 
 
         public PlacementMode Mode
@@ -54,6 +76,9 @@ namespace DropDownCustomColorPicker
 
         public static readonly DependencyProperty ModeProperty =
             DependencyProperty.Register("Mode", typeof(PlacementMode), typeof(CustomColorPicker), new PropertyMetadata(PlacementMode.Bottom));
+
+
+        #endregion
 
 
         public Color SelectedColor
@@ -78,28 +103,54 @@ namespace DropDownCustomColorPicker
         }
 
 
+        /// <summary>
+        /// 打开Picker
+        /// </summary>
         public void OpenPicker()
         {
+            // 为快捷菜单设置焦点
             this.b.Focus();
 
             b_PreviewMouseLeftButtonUp(null, null);
         }
 
+        /// <summary>
+        /// 关闭 Picker
+        /// </summary>
         public void ClosePicker()
         {
             if (b.ContextMenu != null)
             {
                 b.ContextMenu.IsOpen = false;
             }
+
+            // 转移焦点
+            this.Focus();
+            this.b.Focus();
         }
 
 
+        #region Events
+
         internal void RaiseSelectedColorChangedEvent()
         {
-            RoutedPropertyChangedEventArgs<Color> args = new RoutedPropertyChangedEventArgs<Color>(
-              Colors.Transparent, cp.CustomColor, SelectedColorChangedEvent);
+            RoutedPropertyChangedEventArgs<Color> args = new RoutedPropertyChangedEventArgs<Color>(Colors.Transparent, cp.CustomColor, SelectedColorChangedEvent)
+            {
+                Source = this
+            };
 
             recContent.Fill = new SolidColorBrush(cp.CustomColor);
+            this.RaiseEvent(args);
+        }
+
+
+        protected void RaiseDropDownStateChangedEvent(bool opened)
+        {
+            RoutedPropertyChangedEventArgs<bool> args = new RoutedPropertyChangedEventArgs<bool>(false, opened, DropDownStateChangedEvent)
+            {
+                Source = this
+            };
+
             this.RaiseEvent(args);
         }
 
@@ -114,6 +165,18 @@ namespace DropDownCustomColorPicker
                 b.ContextMenu.IsOpen = true;
             }
         }
+
+        private void ContextMenu_Closed(object sender, RoutedEventArgs e)
+        {
+            RaiseDropDownStateChangedEvent(false);
+        }
+
+        private void ContextMenu_Opened(object sender, RoutedEventArgs e)
+        {
+            RaiseDropDownStateChangedEvent(true);
+        }
+
+        #endregion
 
     }
 }

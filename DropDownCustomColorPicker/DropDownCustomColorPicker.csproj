@@ -85,12 +85,14 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColorToSolidColorBrushConverter.cs" />
     <Compile Include="CustomColorPicker.xaml.cs">
       <DependentUpon>CustomColorPicker.xaml</DependentUpon>
     </Compile>
     <Compile Include="ColorPicker.xaml.cs">
       <DependentUpon>ColorPicker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CustomColors.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
